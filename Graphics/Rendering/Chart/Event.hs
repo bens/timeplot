@@ -28,7 +28,7 @@ import Control.Monad
 #    define BackendProgram ChartBackend
 #endif
 
-data Event t e = LongEvent (t,Bool) (t,Bool) e  -- ^ An event that has a beginning and an end. 
+data Event t e = LongEvent (t,Bool) (t,Bool) e  -- ^ An event that has a beginning and an end.
                                                 --   True = "known explicitly", False = "implicit" (e.g. imposed by axis bounds)
                | PulseEvent t e   -- ^ A zero-length event
                deriving (Show)
@@ -101,7 +101,7 @@ renderPlotEvent p pmap = do
       (Point x0 y0) = pmap (LMin,LMin)
       (Point x1 y1) = pmap (LMax,LMax)
       (cx,cy) = ((x0+x1)/2, (y0+y1)/2)
-      
+
       drawEventFill (PulseEvent t e) = return ()
       drawEventFill (LongEvent (t1,_) (t2,_) e) = do
         let (Point x1 cy)  = pmap (LValue t1, LValue e)

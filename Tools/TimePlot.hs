@@ -33,16 +33,16 @@ import qualified Tools.TimePlot.Incremental as I
 -- Pass 1:
 --  * Compute min/max times
 --  * Compute unique track names
--- 
+--
 -- Then map track names to plotters (track types).
--- 
+--
 -- Pass 2:
 --  * Generate plot data (one-pass multiplexed to tracks)
--- 
-makeChart :: (S.ByteString -> [(ChartKind LocalTime, S.ByteString)]) -> 
+--
+makeChart :: (S.ByteString -> [(ChartKind LocalTime, S.ByteString)]) ->
              IO (ParseResult LocalTime) ->
              Maybe LocalTime -> Maybe LocalTime ->
-             (LocalTime -> String -> String) -> 
+             (LocalTime -> String -> String) ->
              IO (Renderable ())
 makeChart chartKindF parseEvents minT maxT transformLabel = do
   ParseResult events unparseable <- parseEvents
@@ -59,23 +59,23 @@ makeChart chartKindF parseEvents minT maxT transformLabel = do
           i2o t (k,                     suf) = [(S.append t suf, k)]
       let i2oTracks t = concatMap (i2o t) (chartKindF t)
       let t0 = fst (head events)
-      let (minTime, maxTime, outTracks) = foldl' 
-            (\(!mi,!ma,!ts) (t,e) -> (min t mi, max t ma, foldr (uncurry M.insert) ts (i2oTracks $ evt_track e))) 
-            (t0, t0, M.empty) 
+      let (minTime, maxTime, outTracks) = foldl'
+            (\(!mi,!ma,!ts) (t,e) -> (min t mi, max t ma, foldr (uncurry M.insert) ts (i2oTracks $ evt_track e)))
+            (t0, t0, M.empty)
             (dropLateEvents events)
 
       let minOutTime = case minT of Just t -> t ; Nothing -> minTime
       let maxOutTime = case maxT of Just t -> t ; Nothing -> maxTime
       let transformLabels axis = axis & axis_labels %~ map (map (\(t, s) -> (t, transformLabel t s)))
       let commonTimeAxis = transformLabels $ autoAxis [minOutTime, maxOutTime]
-      
+
       -- Pass 2
       events' <- (dropLateEvents . parsedData) `fmap` parseEvents
       let eventsToTracks = [(outTrack, (t,e)) | (t,e) <- events', (outTrack,_) <- i2oTracks (evt_track e)]
 
       let initPlot track = initGen (outTracks M.! track) (S.unpack track) minTime maxTime
       let plots = I.runStreamSummary (I.byKey initPlot) eventsToTracks
-      
+
       -- Render
       return $ renderStackedLayouts $
         slayouts_layouts .~ map (dataToPlot commonTimeAxis (minOutTime,maxOutTime)) (M.elems plots) $

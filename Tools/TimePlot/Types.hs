@@ -143,4 +143,3 @@ data ParseResult t = ParseResult {
     parsedData :: [(t, InEvent)],
     unparseableLines :: [S.ByteString]
   }
-

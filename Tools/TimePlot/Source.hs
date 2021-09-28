@@ -8,7 +8,7 @@ import Data.ByteString.Lex.Fractional
 import Tools.TimePlot.Types
 
 readSource :: (Show t) => (S.ByteString -> Maybe (t, S.ByteString)) -> FilePath -> IO (ParseResult t)
-readSource readTime f = (toParseResult . map (parseLine . B.toStrict) . filter (not . B.null) . blines) `fmap` 
+readSource readTime f = (toParseResult . map (parseLine . B.toStrict) . filter (not . B.null) . blines) `fmap`
                         (if f == "-" then B.getContents else B.readFile f)
   where
     blines   = map pruneLF . B.split '\n'
@@ -44,4 +44,3 @@ readSource readTime f = (toParseResult . map (parseLine . B.toStrict) . filter (
                 (v, _) <- readSigned readDecimal val
                 return (t, InValue track v)
         _   -> Nothing
-

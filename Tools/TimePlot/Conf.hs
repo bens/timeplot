@@ -39,15 +39,15 @@ type Conf = ConcreteConf LocalTime
 data KindChoiceOperator = Cut | Accumulate
 
 readConf :: [String] -> Conf
-readConf args = readConf' parseTime 
+readConf args = readConf' parseTime
   where
     pattern = case (words $ single "time format" "-tf" ("%Y-%m-%d %H:%M:%OS")) of
         "date":f -> S.pack (unwords f)
         f        -> S.pack (unwords f)
-    Just (ourBaseTime,_) = strptime "%Y-%m-%d %H:%M:%OS" "1900-01-01 00:00:00" 
+    Just (ourBaseTime,_) = strptime "%Y-%m-%d %H:%M:%OS" "1900-01-01 00:00:00"
     {-# NOINLINE ourStrptime #-}
     ourStrptime :: S.ByteString -> Maybe (LocalTime, S.ByteString)
-    ourStrptime = if pattern == S.pack "elapsed" 
+    ourStrptime = if pattern == S.pack "elapsed"
                     then \s -> do
                       (d, s') <- readSigned readDecimal s
                       return (fromSeconds d ourBaseTime `add` ourBaseTime, s')
@@ -113,22 +113,22 @@ readConf args = readConf' parseTime
         parseKind ("afreq":_)      = error "afreq requires a single numeric argument, bin size, e.g.: -dk 'afreq 1'"
         parseKind ["freq",    n  ] = KindFreq      {binSize=read n,style=BarsStacked}
         parseKind ["freq",    n,s] = KindFreq      {binSize=read n,style=parseStyle s}
-        parseKind ("freq":_)       = error $ "freq requires a single numeric argument, bin size, e.g.: -dk 'freq 1', " ++ 
+        parseKind ("freq":_)       = error $ "freq requires a single numeric argument, bin size, e.g.: -dk 'freq 1', " ++
                                              "or two arguments, e.g.: -dk 'freq 1 clustered'"
         parseKind ["hist",    n  ] = KindHistogram {binSize=read n,style=BarsStacked}
         parseKind ["hist",    n,s] = KindHistogram {binSize=read n,style=parseStyle s}
-        parseKind ("hist":_)       = error $ "hist requires a single numeric argument, bin size, e.g.: -dk 'hist 1', " ++ 
+        parseKind ("hist":_)       = error $ "hist requires a single numeric argument, bin size, e.g.: -dk 'hist 1', " ++
                                              "or two arguments, e.g.: -dk 'hist 1 clustered'"
         parseKind ["event"       ] = KindEvent
         parseKind ("event":_)      = error "event requires no arguments"
         parseKind ["quantile",b,q] = KindQuantile  {binSize=read b, quantiles=read ("["++q++"]")}
-        parseKind ("quantile":_)   = error $ "quantile requres two arguments: bin size and comma-separated " ++ 
+        parseKind ("quantile":_)   = error $ "quantile requres two arguments: bin size and comma-separated " ++
                                              "(without spaces!) quantiles, e.g.: -dk 'quantile 1 0.5,0.75,0.9'"
         parseKind ["binf",    b,q] = KindBinFreq   {binSize=read b, delims   =read ("["++q++"]")}
-        parseKind ("binf":_)       = error $ "binf requres two arguments: bin size and comma-separated " ++ 
+        parseKind ("binf":_)       = error $ "binf requres two arguments: bin size and comma-separated " ++
                                              "(without spaces!) threshold values, e.g.: -dk 'binf 1 10,50,100,200,500'"
         parseKind ["binh",    b,q] = KindBinHist   {binSize=read b, delims   =read ("["++q++"]")}
-        parseKind ("binh":_)       = error $ "binh requres two arguments: bin size and comma-separated " ++ 
+        parseKind ("binh":_)       = error $ "binh requres two arguments: bin size and comma-separated " ++
                                              "(without spaces!) threshold values, e.g.: -dk 'binh 1 10,50,100,200,500'"
         parseKind ["lines"       ] = KindLines
         parseKind ("lines":_)      = error "lines requires no arguments"
@@ -137,11 +137,11 @@ readConf args = readConf' parseTime
         parseKind ("dots":_)       = error "dots requires 0 or 1 arguments (the argument is alpha value: 0 = transparent, 1 = opaque, default 1)"
         parseKind ["cumsum",  b  ] = KindCumSum    {binSize=read b, subtrackStyle=SumStacked}
         parseKind ["cumsum",  b,s] = KindCumSum    {binSize=read b, subtrackStyle=parseSubtrackStyle s}
-        parseKind ("cumsum":_)     = error $ "cumsum requires 1 or 2 arguments (bin size and subtrack style), e.g.: " ++ 
+        parseKind ("cumsum":_)     = error $ "cumsum requires 1 or 2 arguments (bin size and subtrack style), e.g.: " ++
                                              "-dk 'cumsum 10' or -dk 'cumsum 10 stacked'"
         parseKind ["sum",     b  ] = KindSum       {binSize=read b, subtrackStyle=SumStacked}
         parseKind ["sum",     b,s] = KindSum       {binSize=read b, subtrackStyle=parseSubtrackStyle s}
-        parseKind ("sum":_)        = error $ "sum requires one or two arguments: bin size and optionally " ++ 
+        parseKind ("sum":_)        = error $ "sum requires one or two arguments: bin size and optionally " ++
                                              "subtrack style, e.g.: -dk 'sum 1' or -dk 'sum 1 stacked'"
         parseKind ("duration":"drop":ws)  = KindDuration  {subKind=parseKind ws, dropSubtrack=True}
         parseKind ("duration":ws)  = KindDuration  {subKind=parseKind ws, dropSubtrack=False}
@@ -167,4 +167,3 @@ readConf args = readConf' parseTime
 -- [["2", "q"], ["x"]]
 getArg :: String -> Int -> [String] -> [[String]]
 getArg name arity args = [take arity as | (t:as) <- tails args, t==name]
-

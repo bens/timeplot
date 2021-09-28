@@ -27,7 +27,7 @@ stateful init insert finalize = go init
 
 filterMap :: (a -> Maybe b) -> StreamSummary b r -> StreamSummary a r
 filterMap p s@(Summary insert res) = Summary insert' res
-  where 
+  where
     insert' a = case p a of { Nothing -> filterMap p s ; Just b -> filterMap p (insert b) }
 
 mapInput :: (a -> b) -> StreamSummary b r -> StreamSummary a r
@@ -40,7 +40,7 @@ byTimeBins :: (Ord t) => [t] -> StreamSummary (t,[a]) r -> StreamSummary (t,a) r
 byTimeBins ts s = stateful init' insert' finalize'
   where
     init' = (ts, [], s)
-    insert' (t,a) (t1:t2:ts, curBin, !s) 
+    insert' (t,a) (t1:t2:ts, curBin, !s)
       | t < t1 = error "Times are not in ascending order"
       | t < t2 = (t1:t2:ts, a:curBin, s)
       | True   = insert' (t, a) (t2:ts, [], insert s (t1, reverse curBin))

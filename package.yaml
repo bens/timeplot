@@ -1,0 +1,50 @@
+name: timeplot
+version: 1.0.33
+github: "jkff/timeplot"
+license: BSD3
+author: "Eugene Kirpichov <ekirpichov@gmail.com>"
+maintainer: "Eugene Kirpichov <ekirpichov@gmail.com>"
+copyright: "Eugene Kirpichov, 2009-2011"
+homepage: "http://haskell.org/haskellwiki/Timeplot"
+stability: stable
+
+extra-source-files:
+  - README
+
+category: Graphics
+
+synopsis: A tool for visualizing time series from log files.
+
+description: |-
+  A tool for visualizing time series from log files. Reads an input
+  file with events in different "tracks" and draws a diagram for each track,
+  where a diagram may be one of several types. See --help for help and the
+  homepage for a bigger description, examples and a tutorial. See presentation:
+  <http://www.slideshare.net/jkff/two-visualization-tools> or download:
+  <http://jkff.info/presentations/two-visualization-tools.pdf>.
+
+executables:
+  tplot:
+    source-dirs: .
+    main: Tools/TimePlot.hs
+    dependencies:
+      - Chart
+      - Chart-cairo
+      - base
+      - bytestring
+      - bytestring-lexing
+      - cairo
+      - colour
+      - containers
+      - data-default
+      - lens
+      - regex-tdfa
+      - strptime
+      - time
+      - transformers
+      - vcs-revision
+      - template-haskell
+    ghc-options:
+      - -O2
+      - -rtsopts
+      - -Wall
